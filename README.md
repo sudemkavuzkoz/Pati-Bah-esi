@@ -58,7 +58,7 @@ Projeyi çalıştırmak için herhangi bir paket yöneticisine veya derleme (bui
 
 1. Depoyu klonlayın veya zip olarak indirin:
    ```bash
-   git clone https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ.git
+   git clone https://github.com/sudemkavuzkoz/Pati-Bah-esi.git
    ```
 2. Proje dizinine gidin ve `index.html` dosyasını favori tarayıcınızda çift tıklayarak açın.
 
