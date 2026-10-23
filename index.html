@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pati Bahçesi: 2D modern minimalist sevimli evcil hayvan besleme, görev tamamlama ve yeni hayvanlar keşfetme oyunu.">
+  <title>Pati Bahçesi — Sevimli Evcil Hayvan Dünyası</title>
+  
+  <!-- Professional Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css?v=2.3">
+</head>
+<body>
+  <!-- App Container -->
+  <div id="game-app" class="game-container theme-garden">
+    
+    <!-- Top Navigation / Header Bar -->
+    <header class="game-header">
+      <div class="brand-area">
+        <div class="logo-icon">🐾</div>
+        <div class="brand-text">
+          <h1 class="game-title">Pati Bahçesi</h1>
+          <span class="game-subtitle">Cozy Pet Sanctuary</span>
+        </div>
+      </div>
+
+      <!-- Currency & Progression Bar -->
+      <div class="stats-overview">
+        <div class="stat-badge coins-badge" id="coins-display" title="Pati Parası">
+          <span class="badge-icon">🪙</span>
+          <span class="badge-val" id="coin-count">120</span>
+        </div>
+        <div class="stat-badge hearts-badge" id="hearts-display" title="Toplam Sevgi">
+          <span class="badge-icon">💖</span>
+          <span class="badge-val" id="heart-count">45</span>
+        </div>
+        <div class="stat-badge unlocked-badge" id="pets-count-display" title="Açılan Hayvanlar">
+          <span class="badge-icon">🏡</span>
+          <span class="badge-val"><span id="unlocked-pets-count">1</span>/6 Dost</span>
+        </div>
+      </div>
+
+      <!-- Action Icons (Sound, Theme, Reset) -->
+      <div class="header-actions">
+        <button id="theme-toggle-btn" class="icon-btn" title="Ortamı Değiştir" aria-label="Ortamı Değiştir">
+          <span>🎨</span>
+        </button>
+        <button id="audio-toggle-btn" class="icon-btn" title="Sesleri Aç/Kapat" aria-label="Sesleri Aç/Kapat">
+          <span id="audio-icon">🔊</span>
+        </button>
+        <button id="help-btn" class="icon-btn" title="Nasıl Oynanır?" aria-label="Nasıl Oynanır?">
+          <span>❓</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Sanctuary Stage -->
+    <main class="sanctuary-stage" id="sanctuary-stage">
+      
+      <!-- Ambient Environment Elements (Sun/Moon, clouds, floating butterflies) -->
+      <div class="ambient-sky">
+        <div class="celestial-body" id="celestial-body"></div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="butterfly" id="butterfly">🦋</div>
+      </div>
+
+      <!-- Active Pet Presentation -->
+      <section class="pet-showcase" id="pet-showcase">
+        <!-- Floating Speech / Mood Bubble -->
+        <div class="mood-bubble" id="mood-bubble">
+          <span class="bubble-text" id="bubble-text">Miyav! Karnım biraz acıktı...</span>
+          <span class="bubble-tail"></span>
+        </div>
+
+        <!-- Interactive Pet Avatar Wrapper -->
+        <div class="pet-character-wrapper" id="pet-character-wrapper" role="button" tabindex="0" title="Sevmek için tıkla veya okşa!">
+          <!-- Dynamic SVG Vector Pet will be rendered here -->
+          <div id="pet-svg-container" class="pet-svg-container"></div>
+          
+          <!-- Shadow -->
+          <div class="pet-ground-shadow" id="pet-shadow"></div>
+
+          <!-- Sleep Zzz particles -->
+          <div class="sleep-particles" id="sleep-particles">
+            <span>z</span><span>Z</span><span>Z</span>
+          </div>
+
+          <!-- Bath Bubbles -->
+          <div class="soap-bubbles" id="soap-bubbles"></div>
+        </div>
+
+        <!-- Pet Info Card -->
+        <div class="pet-meta-card">
+          <div class="pet-identity">
+            <h2 class="pet-name" id="current-pet-name" title="İsmi değiştirmek için tıkla">Pamuk</h2>
+            <button class="rename-icon-btn" id="rename-pet-btn" title="Dostunun İsmini Değiştir" aria-label="Dostunun İsmini Değiştir">✏️</button>
+            <span class="pet-species-tag" id="current-pet-species">Tekir Kedi 🐾</span>
+            <span class="pet-mood-badge" id="current-pet-mood">😊 Mutlu</span>
+          </div>
+          <div class="pet-progression-wrap">
+            <span class="pet-level-badge" id="current-pet-level">Lv. 1 Bebek</span>
+            <div class="pet-xp-track" title="Deneyim Puanı (Besleyerek ve severek XP kazan!)">
+              <div class="pet-xp-fill" id="pet-xp-fill" style="width: 25%;"></div>
+            </div>
+            <span class="pet-xp-text" id="pet-xp-text">25/100 XP</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pet Needs HUD (Status Meters) -->
+      <section class="needs-hud" id="needs-hud" aria-label="Evcil Hayvan İhtiyaçları">
+        
+        <!-- Hunger Bar -->
+        <div class="need-meter-card" id="meter-hunger">
+          <div class="need-header">
+            <span class="need-icon">🍖</span>
+            <span class="need-label">Tokluk</span>
+            <span class="need-percent" id="val-hunger">70%</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-hunger" id="bar-hunger" style="width: 70%;"></div>
+          </div>
+        </div>
+
+        <!-- Happiness Bar -->
+        <div class="need-meter-card" id="meter-happiness">
+          <div class="need-header">
+            <span class="need-icon">💖</span>
+            <span class="need-label">Mutluluk</span>
+            <span class="need-percent" id="val-happiness">85%</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-happiness" id="bar-happiness" style="width: 85%;"></div>
+          </div>
+        </div>
+
+        <!-- Energy Bar -->
+        <div class="need-meter-card" id="meter-energy">
+          <div class="need-header">
+            <span class="need-icon">⚡</span>
+            <span class="need-label">Enerji</span>
+            <span class="need-percent" id="val-energy">60%</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-energy" id="bar-energy" style="width: 60%;"></div>
+          </div>
+        </div>
+
+        <!-- Hygiene Bar -->
+        <div class="need-meter-card" id="meter-hygiene">
+          <div class="need-header">
+            <span class="need-icon">🧼</span>
+            <span class="need-label">Temizlik</span>
+            <span class="need-percent" id="val-hygiene">90%</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-hygiene" id="bar-hygiene" style="width: 90%;"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Care Action Dock (Besle, Sev, Yıka, Uyut, Oyna) -->
+      <nav class="care-dock" id="care-dock" aria-label="Bakım Araçları">
+        <button class="action-dock-btn active" id="dock-btn-feed" data-action="feed">
+          <span class="action-icon">🍱</span>
+          <span class="action-label">Besle</span>
+        </button>
+        <button class="action-dock-btn" id="dock-btn-pet" data-action="pet">
+          <span class="action-icon">👋</span>
+          <span class="action-label">Sev</span>
+        </button>
+        <button class="action-dock-btn" id="dock-btn-wash" data-action="wash">
+          <span class="action-icon">🛁</span>
+          <span class="action-label">Yıka</span>
+        </button>
+        <button class="action-dock-btn" id="dock-btn-sleep" data-action="sleep">
+          <span class="action-icon" id="sleep-btn-icon">🌙</span>
+          <span class="action-label" id="sleep-btn-label">Uyut</span>
+        </button>
+        <button class="action-dock-btn highlight-btn" id="dock-btn-minigame" data-action="minigame">
+          <span class="action-icon">🎮</span>
+          <span class="action-label">Mini Oyun</span>
+        </button>
+      </nav>
+
+      <!-- Sub-tray for Food Selection (Shown when Feed is active) -->
+      <div class="feed-tray" id="feed-tray">
+        <span class="tray-title">Lezzetli Menü (Tıkla ya da Hayvana Sürükle):</span>
+        <div class="food-items-row">
+          <button class="food-item-btn" data-food="kibble" title="Kuru Mama (+15 Tokluk, +5 Enerji)">
+            <span class="food-emoji">🥣</span>
+            <span class="food-name">Kuru Mama</span>
+            <span class="food-boost">+15 Tokluk</span>
+          </button>
+          <button class="food-item-btn" data-food="fish" title="Taze Balık (+25 Tokluk, +15 Mutluluk)">
+            <span class="food-emoji">🐟</span>
+            <span class="food-name">Taze Balık</span>
+            <span class="food-boost">+25 Tokluk</span>
+          </button>
+          <button class="food-item-btn" data-food="carrot" title="Çıtır Havuç (+20 Tokluk, +10 Enerji)">
+            <span class="food-emoji">🥕</span>
+            <span class="food-name">Çıtır Havuç</span>
+            <span class="food-boost">+20 Tokluk</span>
+          </button>
+          <button class="food-item-btn" data-food="cake" title="Ödül Pastası (+35 Tokluk, +30 Mutluluk - 10 Altın)">
+            <span class="food-emoji">🧁</span>
+            <span class="food-name">Ödül Keki</span>
+            <span class="food-boost">+35 Tokluk</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Management Panel: Pets Sanctuary, Quests, Shop -->
+    <footer class="game-bottom-bar">
+      <!-- Pet Selector Carousel / Deck -->
+      <div class="bottom-panel-card pets-deck-card">
+        <div class="deck-header">
+          <div class="deck-title-group">
+            <span class="deck-title">🐾 Dostlarım ve Barınak</span>
+            <span class="deck-count-pill" id="deck-count-pill"><span id="unlocked-pets-count-bottom">1</span>/6 Dost</span>
+          </div>
+          <button id="add-new-pet-btn" class="btn-add-pet-header" title="Kendi Evcil Hayvanını Tasarla ve Ekle">
+            <span class="btn-plus-icon">➕</span>
+            <span>Yeni Hayvan Ekle</span>
+          </button>
+        </div>
+        <div class="pet-roster" id="pet-roster">
+          <!-- Dynamically populated pet avatars -->
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons: Quests, Shop, Wardrobe -->
+      <div class="quick-nav-actions">
+        <button id="open-quests-btn" class="nav-card-btn quest-indicator-btn">
+          <div class="btn-badge-alert" id="quest-alert-dot">!</div>
+          <span class="btn-icon">📜</span>
+          <div class="btn-info">
+            <span class="btn-primary-text">Görevler</span>
+            <span class="btn-sec-text" id="quest-preview-text">3 Yeni Görev!</span>
+          </div>
+        </button>
+
+        <button id="open-shop-btn" class="nav-card-btn">
+          <span class="btn-icon">🛍️</span>
+          <div class="btn-info">
+            <span class="btn-primary-text">Pati Dükkanı</span>
+            <span class="btn-sec-text">Aksesuarlar & Mamalar</span>
+          </div>
+        </button>
+      </div>
+    </footer>
+
+    <!-- MODAL 1: Quests & Pet Unlocks Modal -->
+    <div class="modal-overlay hidden" id="quests-modal" role="dialog" aria-modal="true" aria-labelledby="quests-modal-title">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">📜</span>
+            <div>
+              <h2 id="quests-modal-title" class="modal-heading">Görevler & Yeni Dostlar</h2>
+              <p class="modal-subheading">Görevleri tamamla, Pati Parası ve yepyeni evcil hayvanlar kazan!</p>
+            </div>
+          </div>
+          <button class="close-modal-btn" id="close-quests-btn" aria-label="Kapat">✕</button>
+        </div>
+
+        <!-- Next Pet Unlock Progress Banner -->
+        <div class="unlock-banner" id="unlock-banner">
+          <div class="unlock-pet-avatar" id="next-pet-silhouette">🐶</div>
+          <div class="unlock-info">
+            <div class="unlock-title-row">
+              <span class="unlock-label">Sıradaki Kilit:</span>
+              <strong class="unlock-pet-name" id="next-pet-name">Fındık (Shiba Inu)</strong>
+            </div>
+            <div class="unlock-progress-track">
+              <div class="unlock-progress-bar" id="unlock-progress-bar" style="width: 33%;"></div>
+            </div>
+            <span class="unlock-progress-text" id="unlock-progress-text">1 / 3 Görev Tamamlandı</span>
+          </div>
+        </div>
+
+        <!-- Quests List -->
+        <div class="quests-list" id="quests-list">
+          <!-- Injected via quests.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Shop & Themes Modal -->
+    <div class="modal-overlay hidden" id="shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-modal-title">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">🛍️</span>
+            <div>
+              <h2 id="shop-modal-title" class="modal-heading">Pati Dükkanı</h2>
+              <p class="modal-subheading">Dostların için sevimli şapkalar ve ortam temaları satın al!</p>
+            </div>
+          </div>
+          <button class="close-modal-btn" id="close-shop-btn" aria-label="Kapat">✕</button>
+        </div>
+
+        <!-- Tabs: Hats vs Environments -->
+        <div class="shop-tabs">
+          <button class="shop-tab active" data-tab="hats">🎀 Şapkalar & Süsler</button>
+          <button class="shop-tab" data-tab="themes">🏡 Barınak Temaları</button>
+        </div>
+
+        <div class="shop-items-grid" id="shop-items-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: Mini Game (Catch the Treats) -->
+    <div class="modal-overlay hidden" id="minigame-modal" role="dialog" aria-modal="true" aria-labelledby="minigame-modal-title">
+      <div class="modal-window minigame-window">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">🎮</span>
+            <div>
+              <h2 id="minigame-modal-title" class="modal-heading">Lezzet Yağmuru!</h2>
+              <p class="modal-subheading">Sepeti sağa-sola hareket ettirerek düşen ödülleri topla. Çürük elmalara dikkat et!</p>
+            </div>
+          </div>
+          <button class="close-modal-btn" id="close-minigame-btn" aria-label="Kapat">✕</button>
+        </div>
+
+        <!-- Mini Game Canvas Area -->
+        <div class="minigame-arena">
+          <div class="minigame-hud">
+            <div class="mg-score">Skor: <strong id="mg-score-val">0</strong></div>
+            <div class="mg-timer">Kalan Süre: <strong id="mg-time-val">30s</strong></div>
+            <div class="mg-lives" id="mg-lives-display">❤️❤️❤️</div>
+          </div>
+          <canvas id="minigame-canvas" width="600" height="380"></canvas>
+          
+          <!-- Start / Game Over Overlay -->
+          <div class="mg-overlay" id="mg-overlay">
+            <div class="mg-overlay-card">
+              <span class="mg-overlay-icon" id="mg-overlay-icon">🏆</span>
+              <h3 class="mg-overlay-title" id="mg-overlay-title">Oyuna Hazır mısın?</h3>
+              <p class="mg-overlay-desc" id="mg-overlay-desc">Fareyi veya parmağını kaydırarak ödülleri topla, 100 puana ulaş!</p>
+              <button class="btn-primary" id="mg-start-btn">Hemen Başla 🚀</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: Unlock Celebration Modal (Confetti popup when a new pet is unlocked!) -->
+    <div class="modal-overlay hidden" id="celebration-modal" role="dialog" aria-modal="true">
+      <div class="celebration-card">
+        <div class="confetti-cannon" id="confetti-container"></div>
+        <span class="celebration-stars">✨ 🎉 ✨</span>
+        <h2 class="celebration-heading">TEBRİKLER!</h2>
+        <p class="celebration-subtext">Yeni bir evcil hayvanın kilidini açtın!</p>
+        
+        <div class="celebrated-pet-preview" id="celebrated-pet-preview">
+          <!-- Injected SVG -->
+        </div>
+
+        <h3 class="celebrated-pet-title" id="celebrated-pet-title">Fındık (Shiba Inu)</h3>
+        <p class="celebrated-pet-desc" id="celebrated-pet-desc">Artık barınağında seninle birlikte yaşayabilir!</p>
+
+        <button class="btn-primary celebration-action-btn" id="celebration-confirm-btn">
+          Harika, Onu Sev! 🐾
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 5: Create / Add New Pet Modal -->
+    <div class="modal-overlay hidden" id="add-pet-modal" role="dialog" aria-modal="true" aria-labelledby="add-pet-modal-title">
+      <div class="modal-window add-pet-window">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">✨</span>
+            <div>
+              <h2 id="add-pet-modal-title" class="modal-heading">Yeni Evcil Hayvan Oluştur</h2>
+              <p class="modal-subheading">Kendi sevimli dostunu tasarla, özelleştir ve barınağına davet et!</p>
+            </div>
+          </div>
+          <button class="close-modal-btn" id="close-add-pet-btn" aria-label="Kapat">✕</button>
+        </div>
+
+        <div class="add-pet-body">
+          <!-- Live Preview Box -->
+          <div class="add-pet-preview-side">
+            <div class="add-pet-avatar-frame">
+              <div id="new-pet-svg-preview" class="new-pet-svg-preview"></div>
+            </div>
+            <div class="preview-pet-badge">
+              <strong id="preview-pet-name-display">Lokum</strong>
+              <span id="preview-pet-species-display">Tekir Kedi • Enerjik 🐾</span>
+            </div>
+          </div>
+
+          <!-- Creation Form -->
+          <form class="add-pet-form" id="add-pet-form" onsubmit="return false;">
+            <!-- Species Selector -->
+            <div class="form-group">
+              <label class="form-label">Hayvan Türü:</label>
+              <div class="species-picker-grid" id="species-picker-grid">
+                <button type="button" class="species-chip active" data-species="cat">🐱 Kedi</button>
+                <button type="button" class="species-chip" data-species="dog">🐶 Köpek</button>
+                <button type="button" class="species-chip" data-species="bunny">🐰 Tavşan</button>
+                <button type="button" class="species-chip" data-species="fox">🦊 Tilki</button>
+                <button type="button" class="species-chip" data-species="panda">🐼 Panda</button>
+                <button type="button" class="species-chip" data-species="dragon">🐉 Ejderha</button>
+                <button type="button" class="species-chip" data-species="parrot">🦜 Papağan</button>
+                <button type="button" class="species-chip" data-species="hamster">🐹 Hamster</button>
+              </div>
+            </div>
+
+            <!-- Name Input -->
+            <div class="form-group">
+              <label class="form-label" for="new-pet-name-input">Dostunun İsmi:</label>
+              <div class="input-with-button">
+                <input type="text" id="new-pet-name-input" class="form-input" placeholder="Örn: Zeytin, Güneş, Lokum..." maxlength="16" value="Lokum">
+                <button type="button" id="random-name-btn" class="btn-secondary-action" title="Rastgele İsim Öner">🎲 Rastgele</button>
+              </div>
+            </div>
+
+            <!-- Color Palette -->
+            <div class="form-group">
+              <label class="form-label">Tüy / Kürk Rengi:</label>
+              <div class="color-palette-row">
+                <div class="preset-colors-wrap" id="preset-colors-wrap">
+                  <!-- Populated dynamically via JS -->
+                </div>
+                <div class="custom-color-wrap">
+                  <label class="color-picker-label" for="new-pet-color-picker" title="Özel Renk Seç">
+                    <span>🎨</span>
+                    <span>Özel</span>
+                    <input type="color" id="new-pet-color-picker" value="#fed7aa">
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personality Selector -->
+            <div class="form-group">
+              <label class="form-label">Kişilik & Karakter:</label>
+              <div class="personality-chips-row" id="personality-chips-row">
+                <button type="button" class="personality-chip active" data-personality="energetic">⚡ Enerjik</button>
+                <button type="button" class="personality-chip" data-personality="sleepy">💤 Uykucu</button>
+                <button type="button" class="personality-chip" data-personality="curious">🧠 Meraklı</button>
+                <button type="button" class="personality-chip" data-personality="foodie">🧁 Gurme</button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button type="button" id="cancel-add-pet-btn" class="btn-cancel">Vazgeç</button>
+              <button type="button" id="confirm-add-pet-btn" class="btn-primary create-pet-btn">
+                Barınağa Katıl! 🐾
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: Rename Pet Modal -->
+    <div class="modal-overlay hidden" id="rename-modal" role="dialog" aria-modal="true" aria-labelledby="rename-modal-title">
+      <div class="modal-window rename-window">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">✏️</span>
+            <div>
+              <h2 id="rename-modal-title" class="modal-heading">Dostunun İsmini Değiştir</h2>
+              <p class="modal-subheading">Evcil hayvanına dilediğin özel ve sevimli ismi verebilirsin.</p>
+            </div>
+          </div>
+          <button class="close-modal-btn" id="close-rename-btn" aria-label="Kapat">✕</button>
+        </div>
+
+        <div class="rename-body">
+          <div class="rename-current-info">
+            <span class="rename-pet-icon" id="rename-pet-icon">🐱</span>
+            <div>
+              <span class="rename-species-tag" id="rename-species-tag">Tekir Kedi 🐾</span>
+              <strong class="rename-current-label">Şu anki İsim: <span id="rename-old-name">Pamuk</span></strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rename-input-field">Yeni İsim Belirle:</label>
+            <div class="input-with-button">
+              <input type="text" id="rename-input-field" class="form-input" maxlength="18" placeholder="Yeni bir isim girin...">
+              <button type="button" id="rename-random-btn" class="btn-secondary-action">🎲 Rastgele</button>
+            </div>
+          </div>
+
+          <!-- Quick suggestion pills -->
+          <div class="name-suggestions-wrap">
+            <span class="suggestion-hint">Hızlı Popüler Öneriler:</span>
+            <div class="suggestion-pills" id="suggestion-pills">
+              <button type="button" class="name-pill">Şimşek</button>
+              <button type="button" class="name-pill">Lokum</button>
+              <button type="button" class="name-pill">Gofret</button>
+              <button type="button" class="name-pill">Zeytin</button>
+              <button type="button" class="name-pill">Boncuk</button>
+              <button type="button" class="name-pill">Karamel</button>
+              <button type="button" class="name-pill">Maviş</button>
+              <button type="button" class="name-pill">Tarçın</button>
+              <button type="button" class="name-pill">Bulut</button>
+              <button type="button" class="name-pill">Maya</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancel-rename-btn" class="btn-cancel">Vazgeç</button>
+            <button type="button" id="save-rename-btn" class="btn-primary">İsmi Kaydet ✨</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Toast / Notification -->
+    <div class="toast-notification hidden" id="toast-notification">
+      <span class="toast-icon" id="toast-icon">✨</span>
+      <span class="toast-message" id="toast-msg">Bildirim</span>
+    </div>
+
+  </div>
+
+  <!-- Game Scripts (Modular Architecture) -->
+  <script src="js/audio.js?v=2.3"></script>
+  <script src="js/pets.js?v=2.3"></script>
+  <script src="js/quests.js?v=2.3"></script>
+  <script src="js/minigame.js?v=2.3"></script>
+  <script src="js/app.js?v=2.3"></script>
+</body>
+</html>
